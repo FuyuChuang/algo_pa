@@ -35,6 +35,7 @@ public:
     map<int, unordered_set<int>> getDegrees() const { return degrees_; }
 
     void solve();
+    bool findOrder();
     void printSummary();
 
 
@@ -52,7 +53,6 @@ private:
 
     // private member functions
     bool dfs(int node, vector<bool>& onpath, vector<bool>& visited);
-    bool findOrder();
     void findOrderDfs();
     void makeGraph();
     void computeIndegree();
