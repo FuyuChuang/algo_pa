@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <iomanip>
 #include <cassert>
 #include "scheduler.hpp"
 
@@ -18,6 +19,8 @@ using namespace std;
 Scheduler::Scheduler(fstream& testcase)
 {
     this->parseInput(testcase);
+    this->makeGraph();
+    /*
     for (size_t i = 0, end = courseInfo_.size(); i < end; ++i) {
         cout << i << " " << courseInfo_[i] << endl;
     }
@@ -25,6 +28,7 @@ Scheduler::Scheduler(fstream& testcase)
     for (size_t i = 0, end = prerequisites_.size(); i < end; ++i) {
         cout << prerequisites_[i].first << " " << prerequisites_[i].second << endl;
     }
+    */
 }
 
 Scheduler::~Scheduler()
@@ -33,12 +37,71 @@ Scheduler::~Scheduler()
 }
 
 void
-Scheduler::findOrder()
+Scheduler::solve()
 {
-
+    if (!findOrder()) {
+        cout << "-1" << endl;
+    } else {
+        cout << fixed << setprecision(1) << numYears_ << endl;
+        for (auto semester : courseSchedule_) {
+            if (semester.size() == 0) {
+                cout << "-1" << endl;
+            } else {
+                for (size_t i = 0, end = semester.size(); i < end; ++i) {
+                    cout << semester[i] << " ";
+                }
+                cout << endl;
+            }
+        }
+    }
     return;
 }
 
+bool
+Scheduler::findOrder()
+{
+    int counter = 0;
+    size_t courseTaken = 0;
+    this->computeIndegree();
+
+    while (degrees_[0].size() != 0) {
+        vector<int> thisSemesterCourses;
+        for (auto course : degrees_[0]) {
+            if (courseInfo_[course] == counter || courseInfo_[course] == 2) {
+                thisSemesterCourses.push_back(course);
+                ++courseTaken;
+            }
+        }
+        for (auto course : thisSemesterCourses) {
+            degrees_[0].erase(course);
+            for (auto neigh : graph_[course]) {
+                degrees_[courseDegrees_[neigh]].erase(neigh);
+                degrees_[--courseDegrees_[neigh]].insert(neigh);
+            }
+        }
+        courseSchedule_.push_back(thisSemesterCourses);
+        numYears_ += 0.5;
+        counter = 1 - counter;
+    }
+    if (courseTaken != numCourses_)
+        return false;
+
+    return true;
+}
+
+void
+Scheduler::findOrderDfs()
+{
+    vector<bool> onpath(numCourses_, false), visited(numCourses_, false);
+    for (size_t i = 0; i < numCourses_; ++i) {
+        if (!visited[i] && dfs(i, onpath, visited)) {
+            // cycle detected
+        }
+    }
+    return;
+}
+
+/*
 void
 Scheduler::writeOutput(fstream& output)
 {
@@ -46,21 +109,71 @@ Scheduler::writeOutput(fstream& output)
     return;
 }
 
-
-// private member functions
 void
-Scheduler::dfs()
+Scheduler::printSummary()
 {
 
     return;
+}
+*/
+
+
+// private member functions
+bool
+Scheduler::dfs(int node, vector<bool>& onpath, vector<bool>& visited)
+{
+    if (visited[node])
+        return false;
+    onpath[node] = visited[node] = true;
+    for (int neigh : graph_[node]) {
+        if (onpath[neigh] || dfs(neigh, onpath, visited))
+            return true;
+    }
+    return onpath[node] = false;
 }
 
 void
 Scheduler::makeGraph()
 {
+    graph_.resize(numCourses_);
+    for (auto pre : prerequisites_) {
+        graph_[pre.second].insert(pre.first);
+    }
+    return;
+}
+
+void
+Scheduler::computeIndegree()
+{
+    // degree for each course
+    courseDegrees_.resize(numCourses_, 0);
+    for (auto neighbors : graph_) {
+        for (int neigh : neighbors) {
+            ++courseDegrees_[neigh];
+        }
+    }
+    assert(courseDegrees_.size() == numCourses_);
+
+    for (size_t i = 0; i < numCourses_; ++i) {
+        degrees_[courseDegrees_[i]].insert(int(i));
+    }
 
     return;
 }
+
+/*
+void
+Scheduler::computeIndegree()
+{
+    degrees_.resize(numCourses_, 0);
+    for (auto neighbors : graph_) {
+        for (int neigh : neighbors) {
+            ++degrees_[neigh];
+        }
+    }
+    return;
+}
+*/
 
 void
 Scheduler::parseInput(fstream& testcase)
@@ -72,12 +185,12 @@ Scheduler::parseInput(fstream& testcase)
     getline(testcase, str);
     stringstream s(str);
     s >> token;
-    numCourse_ = stoi(token);
+    numCourses_ = stoi(token);
     s >> token;
     numPrereq_ = stoi(token);
 
     // courses information
-    for (size_t i = 0; i < numCourse_; ++i) {
+    for (size_t i = 0; i < numCourses_; ++i) {
         getline(testcase, str);
         stringstream ss(str);
         // course id
@@ -86,7 +199,7 @@ Scheduler::parseInput(fstream& testcase)
         ss >> token;
         courseInfo_.push_back(stoi(token));
     }
-    assert(courseInfo_.size() == numCourse_);
+    assert(courseInfo_.size() == numCourses_);
 
 
     // prerequisite pairs

@@ -12,7 +12,7 @@
 
 #include <fstream>
 #include <vector>
-#include <queue>
+#include <map>
 #include <unordered_set>
 
 using namespace std;
@@ -26,23 +26,29 @@ public:
     Scheduler(fstream& testcase);
     ~Scheduler();
 
-    void findOrder();
-    void writeOutput(fstream& output);
+    void solve();
+    bool findOrder();
+    void findOrderDfs();
+    // void writeOutput(fstream& output);
+    void printSummary();
 
 
 private:
-    size_t                      numCourse_;     // number of courses
-    size_t                      numPrereq_;     // number of prerequisite pairs
-    queue<int>                  zeros_;
-    vector<int>                 courseInfo_;    // course information (semester)
-    vector<int>                 degrees_;
-    vector<int>                 topoOrders_;
-    vector<Prereq>              prerequisites_;
-    vector<unordered_set<int>>  graph_;
+    double                      numYears_;          // counter for number of years
+    size_t                      numCourses_;        // number of courses
+    size_t                      numPrereq_;         // number of prerequisite pairs
+    vector<int>                 courseInfo_;        // course information (semester)
+    vector<int>                 courseDegrees_;     // course input degresss
+    vector<Prereq>              prerequisites_;     // prerequisite pairs
+    vector<vector<int>>         courseSchedule_;    // output course schedule
+    vector<unordered_set<int>>  graph_;             // course graph
+
+    map<int, unordered_set<int>>    degrees_;       // record the degrees
 
     // private member functions
-    void dfs();
+    bool dfs(int node, vector<bool>& onpath, vector<bool>& visited);
     void makeGraph();
+    void computeIndegree();
     void parseInput(fstream& testcase);
 };
 

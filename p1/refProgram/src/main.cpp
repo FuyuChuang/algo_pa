@@ -16,31 +16,23 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    fstream testcase, output;
+    fstream testcase;
 
-    if (argc == 3) {
+    if (argc == 2) {
         testcase.open(argv[1], ios::in);
-        output.open(argv[2], ios::out);
+        // output.open(argv[2], ios::out);
         if (!testcase) {
             cerr << "Cannot open the input file \"" << argv[1]
                  << "\". The program will be terminated..." << endl;
             exit(1);
         }
-        if (!output) {
-            cerr << "Cannot open the output file \"" << argv[2]
-                 << "\". The program will be terminated..." << endl;
-            exit(1);
-        }
     } else {
-        cerr << string("Usage: ") + argv[0] + " <testcase> <output file>"
-             << endl;
-
+        cerr << string("Usage: ") + argv[0] + " <testcase>" << endl;
         return 1;
     }
 
     Scheduler scheduler(testcase);
-    scheduler.findOrder();
-    scheduler.writeOutput(output);
+    scheduler.solve();
 
     return 0;
 }
