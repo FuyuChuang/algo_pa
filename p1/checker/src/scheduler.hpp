@@ -32,6 +32,7 @@ public:
     size_t getNumPrereq() const     { return numPrereq_; }
     vector<int> getCourseInfo() const       { return courseInfo_; }
     vector<int> getCourseDegrees() const    { return courseDegrees_; }
+    vector<unordered_set<int>> getGraph() const { return graph_; }
     map<int, unordered_set<int>> getDegrees() const { return degrees_; }
 
     void solve();

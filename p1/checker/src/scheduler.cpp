@@ -16,7 +16,8 @@
 
 using namespace std;
 
-Scheduler::Scheduler(fstream& testcase)
+Scheduler::Scheduler(fstream& testcase) :
+    numYears_(0), numCourses_(0), numPrereq_(0)
 {
     this->parseInput(testcase);
     this->makeGraph();

@@ -16,7 +16,8 @@
 
 using namespace std;
 
-Scheduler::Scheduler(fstream& testcase)
+Scheduler::Scheduler(fstream& testcase) :
+    numYears_(0), numCourses_(0), numPrereq_(0)
 {
     this->parseInput(testcase);
     this->makeGraph();
@@ -32,17 +33,17 @@ void
 Scheduler::solve()
 {
     if (!findOrder()) {
-        cout << "-1" << endl;
+        cout << "-1" << '\n';
     } else {
-        cout << fixed << setprecision(1) << numYears_ << endl;
+        cout << fixed << setprecision(1) << numYears_ << '\n';
         for (auto semester : courseSchedule_) {
             if (semester.size() == 0) {
-                cout << "-1" << endl;
+                cout << "-1" << '\n';
             } else {
                 for (size_t i = 0, end = semester.size(); i < end; ++i) {
                     cout << semester[i] << " ";
                 }
-                cout << endl;
+                cout << '\n';
             }
         }
     }

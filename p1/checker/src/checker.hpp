@@ -24,26 +24,28 @@ class Checker
 {
 public:
     // constructor & destructor
-    Checker(fstream& testcase, fstream& output);
+    Checker(fstream& testcase);
     ~Checker();
 
-    void check();
+    bool check(fstream& output);
 
 
 private:
     bool                        legalTestcase_;     // whether the testcase is legal
     bool                        correct_;           // whether the output is correct
     double                      numYearsRef_;       // number of years
+    double                      numYears_;          // number of years (to be checked)
     size_t                      numCourses_;        // number of courses
     Scheduler                   schedulerRef_;      // reference scheduler
+    vector<int>                 courseDegrees_;     // course input degrees
     vector<int>                 courseInfo_;        // course information (semester)
     // vector<int>                 courseDegrees_;     // course input degresss
     vector<vector<int>>         courseSchedule_;    // course schedule that needs to be checked
+    vector<unordered_set<int>>  graph_;             // course graph
 
     map<int, unordered_set<int>>    degrees_;       // record the degrees
 
     // private member functions
-    void setupChecker(fstream& output);
 };
 
 #endif // CHECKER_H

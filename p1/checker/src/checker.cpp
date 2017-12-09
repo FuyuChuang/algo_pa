@@ -16,7 +16,7 @@
 
 using namespace std;
 
-Checker::Checker(fstream& testcase, fstream& output) :
+Checker::Checker(fstream& testcase) :
     schedulerRef_(Scheduler(testcase))
 {
     correct_ = true;
@@ -25,32 +25,94 @@ Checker::Checker(fstream& testcase, fstream& output) :
     // schedulerRef_ = Scheduler(testcase);
     numCourses_ = schedulerRef_.getNumCourses();
     courseInfo_ = schedulerRef_.getCourseInfo();
+    courseDegrees_ = schedulerRef_.getCourseDegrees();
     degrees_ = schedulerRef_.getDegrees();
+    graph_ = schedulerRef_.getGraph();
 
     legalTestcase_ = schedulerRef_.findOrder();
     numYearsRef_ = schedulerRef_.getNumYears();
-
-    this->setupChecker(output);
 }
 
 Checker::~Checker()
 {
 
-
 }
 
-void
-Checker::check()
+bool
+Checker::check(fstream& output)
 {
+    int counter = 0;
+    string str, token;
+    double numYearsCheck = 0;
+    vector<bool> taken(numCourses_, false);
 
-    return;
+    // the first line is the number of years it takes
+    getline(output, str);
+    stringstream s(str);
+    s >> token;
+    numYears_ = stod(token);
+
+    // correctly detect illegal testcase
+    if (!legalTestcase_ && numYears_ == -1) {
+        return correct_ = true;
+    } else if (!legalTestcase_ && numYears_ != -1) {
+        cout << "incorrect1" << endl;
+        return correct_ = false;
+    } else if (legalTestcase_ && numYears_ != numYearsRef_) {
+        cout << "incorrect2" << endl;
+        // legal case but not minimum time
+        return correct_ = false;
+    }
+
+    while (getline(output, str)) {
+        stringstream ss(str);
+        vector<int> thisSemesterCourses;
+        while (ss >> token) {
+            int course = stoi(token);
+            // no course in this semester
+            if (course == -1) {
+                break;
+            }
+            if (taken[course]) {
+                // take the course that has been taken
+                cout << "incorrect3" << endl;
+                return correct_ = false;
+            } else {
+                taken[course] = true;
+                auto it = degrees_[0].find(course);
+                // take course without finishing its prerequisites
+                if (it == degrees_[0].end()) {
+                    cout << "incorrect4" << endl;
+                    return correct_ = false;
+                }
+                // take the course not opened in this semester
+                if (courseInfo_[course] != counter && courseInfo_[course] != 2) {
+                    cout << "incorrect5" << endl;
+                    return correct_ = false;
+                }
+                thisSemesterCourses.push_back(course);
+            }
+        }
+        // update course status
+        for (auto course : thisSemesterCourses) {
+            degrees_[0].erase(course);
+            for (auto neigh : graph_[course]) {
+                degrees_[courseDegrees_[neigh]].erase(neigh);
+                degrees_[--courseDegrees_[neigh]].insert(neigh);
+            }
+        }
+        numYearsCheck += 0.5;
+        counter = 1 - counter;
+    }
+
+    if (numYearsCheck != numYears_) {
+        // the reported number of years is different from calculated
+        cout << "incorrect6" << endl;
+        return correct_ = false;
+    }
+
+
+
+    return correct_ = true;
 }
 
-
-// private member functions
-void
-Checker::setupChecker(fstream& output)
-{
-
-    return;
-}

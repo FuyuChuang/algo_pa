@@ -37,8 +37,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    Checker checker(testcase, output);
-    checker.check();
+    Checker checker(testcase);
+    cout << int(checker.check(output)) << endl;;
 
     return 0;
 }
