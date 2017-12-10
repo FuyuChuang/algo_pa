@@ -42,7 +42,7 @@ Generator::genCredit()
     courseCredits_.resize(numCourses_);
 
     for (size_t i = 0; i < numCourses_; ++i) {
-        courseCredits_[i] = rand() % creditLimit_;
+        courseCredits_[i] = double(rand() % creditLimit_) / 1.5;
     }
 
     return;
@@ -85,7 +85,7 @@ Generator::genPrerequisite()
     // random assignment
     for (size_t i = 0; i < numCourses_; ++i) {
         for (size_t j = 0; j < i; ++j) {
-            if (rand() % 100 < 2) {
+            if (rand() % 120 < 2) {
                 prerequisites_.push_back(make_pair(i, j));
                 ++numPrereqs_;
                 ++courseDegrees_[i];
