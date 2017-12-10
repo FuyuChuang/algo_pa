@@ -20,13 +20,13 @@
 // #define RANDOM_SEMES_NOT_BOTH
 // #define FORCED_SEMES 2
 #define SHUFFLE_ID
-// #define GEN_CYCLE
 
 using namespace std;
 
 void
 Generator::generate(fstream& output)
 {
+    this->genCredit();
     this->genSemester();
     this->genPrerequisite();
     this->shuffleId();
@@ -36,6 +36,18 @@ Generator::generate(fstream& output)
 }
 
 // private member functions
+void
+Generator::genCredit()
+{
+    courseCredits_.resize(numCourses_);
+
+    for (size_t i = 0; i < numCourses_; ++i) {
+        courseCredits_[i] = rand() % creditLimit_;
+    }
+
+    return;
+}
+
 void
 Generator::genSemester()
 {
@@ -73,36 +85,13 @@ Generator::genPrerequisite()
     // random assignment
     for (size_t i = 0; i < numCourses_; ++i) {
         for (size_t j = 0; j < i; ++j) {
-            if (rand() % 200 < 2) {
+            if (rand() % 100 < 2) {
                 prerequisites_.push_back(make_pair(i, j));
                 ++numPrereqs_;
                 ++courseDegrees_[i];
             }
         }
     }
-
-    /*
-    prerequisites_.push_back(make_pair(0, numCourses_ - 1));
-    ++numPrereqs_;
-    ++courseDegrees_[0];
-    for (size_t i = 1; i < numCourses_; ++i) {
-        prerequisites_.push_back(make_pair(i, i-1));
-        ++numPrereqs_;
-        ++courseDegrees_[i];
-    }
-    */
-
-    #ifdef GEN_CYCLE
-    // generate a cycle
-    size_t loopNode = rand() % numCourses_;
-    for (size_t i = loopNode; i < numCourses_; ++i) {
-        if (rand() % 10 > 6) {
-            prerequisites_.push_back(make_pair(i, loopNode));
-            ++numPrereqs_;
-            ++courseDegrees_[loopNode];
-        }
-    }
-    #endif
 
     return;
 }
@@ -130,18 +119,20 @@ Generator::shuffleId()
 void
 Generator::writeOutput(fstream& output)
 {
-    output << numCourses_ << " ";
-    output << numPrereqs_ << '\n';
+    output << numCourses_ << ' ';
+    output << numPrereqs_ << ' ';
+    output << creditLimit_ << '\n';
 
-    // which semester the course is opened
+    // which semester the course is opened and its credit
     for (size_t i = 0; i < numCourses_; ++i) {
-        output << i << " ";
-        output << courseSemes_[i] << '\n';
+        output << i << ' ';
+        output << courseSemes_[i] << ' ';
+        output << courseCredits_[i] << '\n';
     }
 
     // prerequisites
     for (auto prereq : prerequisites_) {
-        output << idMapping_[prereq.first] << " ";
+        output << idMapping_[prereq.first] << ' ';
         output << idMapping_[prereq.second] << '\n';
     }
 
