@@ -8,6 +8,7 @@
 ****************************************************************************/
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include "checker.hpp"
 
@@ -38,7 +39,8 @@ int main(int argc, char** argv)
     }
 
     Checker checker(testcase);
-    cout << int(checker.check(output)) << endl;;
+    cout << fixed << setprecision(2)
+         << (checker.check(output)? checker.getNumYears(): -1) << endl;;
 
     return 0;
 }

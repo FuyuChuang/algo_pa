@@ -27,6 +27,7 @@ public:
     ~Checker();
 
     bool check(fstream& output);
+    double getNumYears() const { return numYears_; }
 
 
 private:

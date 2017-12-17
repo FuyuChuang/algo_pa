@@ -14,6 +14,8 @@
 #include <cassert>
 #include "checker.hpp"
 
+// #define PRINT_MESSAGE
+
 using namespace std;
 
 Checker::Checker(fstream& testcase) :
@@ -47,19 +49,26 @@ Checker::check(fstream& output)
     vector<bool> taken(numCourses_, false);
 
     // the first line is the number of years it takes
-    getline(output, str);
-    stringstream s(str);
-    s >> token;
-    numYears_ = stod(token);
+    if (getline(output, str)) {
+        stringstream s(str);
+        s >> token;
+        numYears_ = stod(token);
+    } else {
+        return false;
+    }
 
     // correctly detect illegal testcase
     if (!legalTestcase_ && numYears_ == -1) {
         return correct_ = true;
     } else if (!legalTestcase_ && numYears_ != -1) {
+        #ifdef PRINT_MESSAGE
         cout << "incorrect1" << endl;
+        #endif
         return correct_ = false;
     } else if (legalTestcase_ && numYears_ != numYearsRef_) {
+        #ifdef PRINT_MESSAGE
         cout << "incorrect2" << endl;
+        #endif
         // legal case but not minimum time
         return correct_ = false;
     }
@@ -75,19 +84,25 @@ Checker::check(fstream& output)
             }
             if (taken[course]) {
                 // take the course that has been taken
+                #ifdef PRINT_MESSAGE
                 cout << "incorrect3" << endl;
+                #endif
                 return correct_ = false;
             } else {
                 taken[course] = true;
                 auto it = degrees_[0].find(course);
                 // take course without finishing its prerequisites
                 if (it == degrees_[0].end()) {
+                    #ifdef PRINT_MESSAGE
                     cout << "incorrect4" << endl;
+                    #endif
                     return correct_ = false;
                 }
                 // take the course not opened in this semester
                 if (courseInfo_[course] != counter && courseInfo_[course] != 2) {
+                    #ifdef PRINT_MESSAGE
                     cout << "incorrect5" << endl;
+                    #endif
                     return correct_ = false;
                 }
                 thisSemesterCourses.push_back(course);
@@ -107,7 +122,9 @@ Checker::check(fstream& output)
 
     if (numYearsCheck != numYears_) {
         // the reported number of years is different from calculated
+        #ifdef PRINT_MESSAGE
         cout << "incorrect6" << endl;
+        #endif
         return correct_ = false;
     }
 

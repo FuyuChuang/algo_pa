@@ -14,7 +14,7 @@
 #include <cassert>
 #include "checker.hpp"
 
-#define PRINT_MESSAGE
+//#define PRINT_MESSAGE
 
 using namespace std;
 
@@ -40,10 +40,16 @@ Checker::check(fstream& output)
     vector<bool> taken(numCourses_, false);
 
     // the first line is the number of years it takes
-    getline(output, str);
-    stringstream s(str);
-    s >> token;
-    numYears_ = stod(token);
+    if (getline(output, str)) {
+        stringstream s(str);
+        s >> token;
+        numYears_ = stod(token);
+    } else {
+        #ifdef PRINT_MESSAGE
+            cout << "No line in the file" << endl;
+        #endif
+        return correct_ = false;
+    }
 
 
     while (getline(output, str)) {
@@ -60,7 +66,7 @@ Checker::check(fstream& output)
             if (taken[course]) {
                 // take the course that has been taken
                 #ifdef PRINT_MESSAGE
-                cout << "Already taken!" << endl;
+                cout << "Course already taken: course #" << course << endl;
                 #endif
                 return correct_ = false;
             } else {
@@ -69,14 +75,15 @@ Checker::check(fstream& output)
                 // take course without finishing its prerequisites
                 if (it == degrees_[0].end()) {
                     #ifdef PRINT_MESSAGE
-                    cout << "Not finishing prerequisites!" << endl;
+                    cout << "Not finishing prerequisites: course #" << course << endl;
                     #endif
                     return correct_ = false;
                 }
                 // take the course not opened in this semester
                 if (courseSemes_[course] != counter && courseSemes_[course] != 2) {
                     #ifdef PRINT_MESSAGE
-                    cout << "Not open!" << endl;
+                    cout << courseSemes_[course] << endl;
+                    cout << "Not open in the semester: course #" << course << endl;
                     #endif
                     return correct_ = false;
                 }
@@ -86,7 +93,7 @@ Checker::check(fstream& output)
         }
         if (creditThisSemester > creditLimit_) {
             #ifdef PRINT_MESSAGE
-            cout << "Exceed credit limit!" << endl;
+            cout << "Exceed credit limit: year #" << numYearsCheck + 0.5 << endl;
             #endif
             return correct_ = false;
         }
@@ -105,7 +112,7 @@ Checker::check(fstream& output)
     if (numYearsCheck != numYears_) {
         // the reported number of years is different from calculated
         #ifdef PRINT_MESSAGE
-        cout << "Reported number of years is incorrect!" << endl;
+        cout << "Reported number of years is incorrect." << endl;
         #endif
         return correct_ = false;
     }
