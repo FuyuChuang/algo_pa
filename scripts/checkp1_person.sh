@@ -8,21 +8,21 @@
 ################################################################################
 
 exe="./checker"
-input_dir="$1"
-output_dir="$2"
-result_dir="$3"
+name="$1"
 
-if [[ "$#" -ne 3 || ! -d "$1" || ! -d "$2" || ! -d "$3" ]]; then
-    echo "Usage "$0" <input dir> <output dir> <result dir>"
+if [[ "$#" -ne 1 ]]; then
+    echo "Usage "$0" <student id>"
     exit 1
 fi
 
-for input in "$input_dir"/*; do
-    input_name=$(basename $input)
-    output_name=""$output_dir"/"$input_name".out"
-    command=""$exe" "$input" "$output_name""
+grade="$name"
+
+for testcase in "testcase1"/*; do
+    case_name=$(basename $testcase)
+    program_output="hw3_f/"$name"/output1/"$case_name".out"
+    command=""$exe" "$testcase" "$program_output""
     echo "$command"
     result="$($command)"
-    echo "$result"
-    echo ""
+    grade=""$grade" "$result""
 done
+printf '%s\n' $grade | paste -sd ',' >> grade.csv

@@ -20,7 +20,6 @@ int main(int argc, char** argv)
 
     if (argc == 2) {
         testcase.open(argv[1], ios::in);
-        // output.open(argv[2], ios::out);
         if (!testcase) {
             cerr << "Cannot open the input file \"" << argv[1]
                  << "\". The program will be terminated..." << endl;
