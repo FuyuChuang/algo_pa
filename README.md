@@ -20,6 +20,6 @@ Usage: ./checker <testcase> <result-to-be-checked>
 
 ### Testcase Generator
 ```sh
-Usage: ./generator <\# of courses> <output file>
+Usage: ./generator <number of courses> <output file>
 ```
 To generate testcases with different constraints, comment out the #define in the source code and `make` again.
